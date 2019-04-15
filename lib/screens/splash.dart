@@ -1,6 +1,10 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
-import 'package:moments/home.dart';
+import 'package:moments/api/api.dart';
+import 'package:moments/utils/utils.dart';
+import 'package:moments/views/views.dart';
+import 'home.dart';
+import 'auth.dart';
 
 class SplashScreen extends StatefulWidget {
   @override
@@ -11,13 +15,11 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    _wait();
-  }
-
-  _wait() async {
-    await Future.delayed(Duration(seconds: 3));
-    Navigator.of(context)
-        .pushReplacement(MaterialPageRoute(builder: (context) => HomeScreen()));
+    lazyExecute(Duration(seconds: 3), () async {
+      FirebaseUser user = await PhoneAuthAPI.currentUser;
+      Navigator.of(context).pushReplacement(
+          user != null ? HomeScreen.builder : AuthScreen.builder);
+    });
   }
 
   @override
@@ -29,19 +31,9 @@ class _SplashScreenState extends State<SplashScreen> {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
-              SvgPicture.asset(
-                'assets/moments.svg',
-                width: 130,
-              ),
+              Logo(),
               SizedBox(height: 12),
-              Text(
-                'Moments',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  letterSpacing: 4,
-                ),
-              ),
+              AppTitle(),
             ],
           ),
         ),
